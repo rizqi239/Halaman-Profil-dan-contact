@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom';
+import type { FC } from 'react';
 
-const Header = () => {
+const Header: FC = () => {
   return (
     <header className="bg-transparent">
       <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 flex items-center justify-between">

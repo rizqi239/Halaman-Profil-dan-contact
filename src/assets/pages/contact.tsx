@@ -1,16 +1,38 @@
-import { useState } from 'react';
-import type { FormEvent } from 'react';
+import { useCallback, useState } from 'react';
+import type { FC, FormEvent, ChangeEvent } from 'react';
 
-const Contact = () => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
-  const [submitted, setSubmitted] = useState(false);
+interface FormData {
+  name: string;
+  email: string;
+  message: string;
+}
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+const initialFormData: FormData = {
+  name: '',
+  email: '',
+  message: '',
+};
+
+const Contact: FC = () => {
+  const [formData, setFormData] = useState<FormData>(initialFormData);
+  const [submitted, setSubmitted] = useState<boolean>(false);
+
+  const handleChange = useCallback((e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value,
+    }));
+  }, []);
+
+  const handleSubmit = useCallback((event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setSubmitted(true);
-  };
+    setTimeout(() => {
+      setFormData(initialFormData);
+      setSubmitted(false);
+    }, 3000);
+  }, []);
 
   return (
     <div className="space-y-8">
@@ -24,7 +46,7 @@ const Contact = () => {
       {submitted ? (
         <div className="rounded-3xl bg-emerald-500/15 p-8 text-emerald-200">
           <h2 className="text-2xl font-semibold">Pesan terkirim!</h2>
-          <p className="mt-2 text-slate-100">Terima kasih, {name}. Kami akan menghubungi Anda segera di {email}.</p>
+          <p className="mt-2 text-slate-100">Terima kasih, {formData.name}. Kami akan menghubungi Anda segera di {formData.email}.</p>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="grid gap-6 rounded-3xl bg-slate-900 p-8 shadow-xl shadow-slate-900/20">
@@ -32,8 +54,9 @@ const Contact = () => {
             <span>Nama</span>
             <input
               type="text"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
               placeholder="Nama lengkap"
               className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-sky-500"
               required
@@ -44,8 +67,9 @@ const Contact = () => {
             <span>Email</span>
             <input
               type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
               placeholder="email@example.com"
               className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-sky-500"
               required
@@ -55,8 +79,9 @@ const Contact = () => {
           <label className="space-y-2 text-sm text-slate-200">
             <span>Pesan</span>
             <textarea
-              value={message}
-              onChange={(event) => setMessage(event.target.value)}
+              name="message"
+              value={formData.message}
+              onChange={handleChange}
               placeholder="Tuliskan pesan Anda di sini..."
               className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-sky-500"
               rows={6}
